@@ -4,7 +4,7 @@ ExportSchem is a Spigot plugin that allows for exporting a WorldEdit clipboard t
 
 ## Configuration
 
-The plugin must be configured before use. On the first startup, a config file will be generated. The comments in this file explain what each config option does.
+The plugin must be configured before use. On the first startup, a config file will be generated. The comments in this file explain what each config option does. After configuring, restart the server.
 
 **Important: You must have the ability to use additional ports. Contact your host if you are unsure what ports you can use.**
 
