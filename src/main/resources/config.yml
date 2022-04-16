@@ -1,0 +1,13 @@
+# If true, the schematics folder will be emptied when the server starts
+clear-on-startup: false
+
+# The file will be deleted after this time. Set to 0 to disable.
+delete-after-minutes: 5
+
+# The port the web server should be run on
+port: 8080
+
+# The URL prefix, the user will be sent this link appended with their schematic token.
+# In a simple setup, this would be your IP and port. If you're using a more advanced setup
+# (such as an Nginx proxy to the web service), you should know what to put here.
+url-prefix: "http://server.ip.here:8080/"

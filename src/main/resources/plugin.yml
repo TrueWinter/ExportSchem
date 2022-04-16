@@ -1,0 +1,22 @@
+name: ExportSchem
+main: dev.truewinter.exportschem.ExportSchem
+version: ${project.version}
+author: TrueWinter
+description: Allows users to export their WorldEdit clipboard to a schematic file and receive a download link
+api-version: 1.18
+
+depend:
+  - WorldEdit
+
+commands:
+  exportschem:
+    usage: /exportschem [about/reload]
+    description: Exports your WorldEdit clipboard to a schematic file
+
+permissions:
+  exportschem.command.exportschem:
+    description: Allows the user to run the exportschem command
+    default: true
+  exportschem.command.reload:
+    description: Allows an admin to reload the config
+    default: op
