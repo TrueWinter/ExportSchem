@@ -2,6 +2,7 @@ package dev.truewinter.exportschem;
 
 import io.javalin.Javalin;
 import io.javalin.core.util.Header;
+import io.javalin.http.HttpCode;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +41,7 @@ public class WebServer extends Thread {
             File file = new File(schemFolder + File.separator + reqFile);
 
             if (!file.exists()) {
+                context.status(HttpCode.NOT_FOUND);
                 context.result("File does not exist");
                 return;
             }
