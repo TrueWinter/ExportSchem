@@ -1,15 +1,29 @@
 package dev.truewinter.exportschem;
 
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.session.SessionManager;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Pattern;
 
 public class ExportSchem extends JavaPlugin {
     private WebServer webServer;
     private HashMap<String, Long> schematicTimes = new HashMap<>();
+    private HashMap<String, ImportKey> importKeys = new HashMap<>();
     private Timer deleteTimer;
     private static ExportSchem instance;
 
@@ -62,18 +76,31 @@ public class ExportSchem extends JavaPlugin {
             @Override
             public void run() {
                 int deleteAfterMinutes = getConfig().getInt("delete-after-minutes");
-                for (String id : schematicTimes.keySet()) {
-                    long currentTime = System.currentTimeMillis();
-                    long savedTime = schematicTimes.get(id);
+                int importExpiryMinutes = getConfig().getInt("import-expiry-minutes");
 
-                    if ((currentTime - savedTime) > (deleteAfterMinutes * 60 * 1000L)) {
-                        File file = new File(getDataFolder() + File.separator + "schematics" + File.separator + id);
-                        boolean deleted = file.delete();
-                        schematicTimes.remove(id);
+                if (deleteAfterMinutes > 0) {
+                    for (String schemId : schematicTimes.keySet()) {
+                        long currentTime = System.currentTimeMillis();
+                        long savedTime = schematicTimes.get(schemId);
 
-                        if (!deleted) {
-                            getLogger().warning("Failed to delete " + id + " after " + deleteAfterMinutes + " minutes");
+                        if ((currentTime - savedTime) > (deleteAfterMinutes * 60 * 1000L)) {
+                            File file = new File(getDataFolder() + File.separator + "schematics" + File.separator + schemId);
+                            boolean deleted = file.delete();
+                            schematicTimes.remove(schemId);
+
+                            if (!deleted) {
+                                getLogger().warning("Failed to delete " + schemId + " after " + deleteAfterMinutes + " minutes");
+                            }
                         }
+                    }
+                }
+
+                for (String importId : importKeys.keySet()) {
+                    long currentTime = System.currentTimeMillis();
+                    long savedTime = importKeys.get(importId).getTimestamp();
+
+                    if ((currentTime - savedTime) > (importExpiryMinutes * 60 * 1000L)) {
+                        importKeys.remove(importId);
                     }
                 }
             }
@@ -86,7 +113,9 @@ public class ExportSchem extends JavaPlugin {
     @Override
     public void onDisable() {
         webServer.stopServer();
-        deleteTimer.cancel();
+        if (deleteTimer != null) {
+            deleteTimer.cancel();
+        }
         getLogger().info("ExportSchem v" + getDescription().getVersion() + " disabled.");
     }
 
@@ -109,5 +138,46 @@ public class ExportSchem extends JavaPlugin {
 
     protected void addFile(String file) {
         schematicTimes.put(file, System.currentTimeMillis());
+    }
+
+    protected void addImportKey(String key, Player player) {
+        importKeys.put(key, new ImportKey(key, player));
+    }
+
+    protected boolean hasImportKey(String key) {
+        return importKeys.containsKey(key);
+    }
+
+    protected ImportKey getImportKey(String key) {
+        return importKeys.get(key);
+    }
+
+    protected void importSchem(String fileName, InputStream input, ImportKey importKey) throws Exception {
+        if (!importKey.getPlayer().isOnline()) {
+            throw new Exception("Player is offline");
+        }
+
+        if (!importKey.getPlayer().hasPermission("exportschem.command.import")) {
+            throw new Exception("Player does not have permission to import schematics");
+        }
+
+        String fileExt = fileName.split(Pattern.quote("."))[fileName.split(Pattern.quote(".")).length - 1].replace(".", "");
+        ClipboardFormat format = ClipboardFormats.findByAlias(fileExt);
+
+        if (format == null) {
+            throw new Exception("Unsupported schematic format");
+        }
+
+        try (ClipboardReader reader = format.getReader(input)) {
+            com.sk89q.worldedit.entity.Player actor = BukkitAdapter.adapt(importKey.getPlayer());
+            SessionManager manager = WorldEdit.getInstance().getSessionManager();
+            LocalSession localSession = manager.get(actor);
+            Clipboard clipboard = reader.read();
+            ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
+            localSession.setClipboard(clipboardHolder);
+
+            importKey.getPlayer().sendMessage(ChatColor.GREEN + "Schematic imported");
+            importKeys.remove(importKey.getKey());
+        }
     }
 }

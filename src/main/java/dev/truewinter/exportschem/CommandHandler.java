@@ -17,6 +17,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 
         registerSubCommand("about", new AboutCommand());
         registerSubCommand("reload", new ReloadCommand());
+        registerSubCommand("import", new ImportCommand());
     }
 
     @Override

@@ -1,0 +1,48 @@
+<!DOCTYPE>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>ExportSchem Import</title>
+        <style>
+            body {
+                background-color: #222;
+                color: white;
+            }
+
+            #main {
+                background-color: #444;
+                padding: 32px;
+                border-radius: 8px;
+                text-align: center;
+            }
+
+            #copyright {
+                font-size: small;
+            }
+
+            h1 {
+                margin-top: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main">
+            <h1>Schematic Upload</h1>
+            <div>Uploading schematic to {{player}}'s WorldEdit clipboard</div>
+            <hr>
+            <form id="uploadForm" method="post" enctype="multipart/form-data">
+                <div>
+                    <input type="file" name="file" accept=".schem,.schematic" required>
+                </div>
+                <br>
+                <div>
+                    <button type="submit">Upload</button>
+                </div>
+            </form>
+            <hr>
+            <div id="copyright">
+                ExportSchem v{{version}} by TrueWinter
+            </div>
+        </div>
+    </body>
+</html>

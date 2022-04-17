@@ -1,6 +1,6 @@
 # ExportSchem
 
-ExportSchem is a Spigot plugin that allows for exporting a WorldEdit clipboard to a downloadable schematic file.
+ExportSchem is a Spigot plugin that allows for importing and exporting your WorldEdit clipboard through a web interface.
 
 ## Configuration
 
@@ -19,10 +19,12 @@ Add something to your clipboard (by copying a selection or loading an existing s
 ## Commands
 
 - `/exportschem`: As explained above
+- `/exportschem import`: Allows you to import a schematic directly to your WorldEdit clipboard
 - `/exportschem about`: Gives information about the plugin
 - `/exportschem reload`: Reloads the config
 
 ## Permissions
 
 - `exportschem.command.exportschem`: Required to use `/exportschem`, enabled by default
+- `exportschem.command.import`: Required to use `/exportschem import`, enabled by default
 - `exportschem.command.reload`: Required to use `/exportschem reload` 

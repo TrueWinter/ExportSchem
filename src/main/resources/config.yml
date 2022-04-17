@@ -4,6 +4,12 @@ clear-on-startup: false
 # The file will be deleted after this time. Set to 0 to disable.
 delete-after-minutes: 5
 
+# Import links will expire after this time
+import-expiry-minutes: 5
+
+# The maximum size in KB
+import-max-size: 20
+
 # The port the web server should be run on
 port: 8080
 

@@ -10,12 +10,15 @@ depend:
 
 commands:
   exportschem:
-    usage: /exportschem [about/reload]
+    usage: /exportschem [import/about/reload]
     description: Exports your WorldEdit clipboard to a schematic file
 
 permissions:
   exportschem.command.exportschem:
-    description: Allows the user to run the exportschem command
+    description: Allows the player to run the exportschem command
+    default: true
+  exportschem.command.import:
+    description: Allows the player to run the import command
     default: true
   exportschem.command.reload:
     description: Allows an admin to reload the config
