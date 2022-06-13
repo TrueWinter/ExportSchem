@@ -4,6 +4,7 @@ import io.javalin.Javalin;
 import io.javalin.core.util.Header;
 import io.javalin.http.HttpCode;
 import io.javalin.http.UploadedFile;
+import io.javalin.http.staticfiles.Location;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +31,11 @@ public class WebServer extends Thread {
     public void run() {
         server = Javalin.create(config -> {
             config.showJavalinBanner = false;
+            config.addStaticFiles(s -> {
+                s.hostedPath = "/download";
+                s.directory = schemFolder;
+                s.location = Location.EXTERNAL;
+            });
         }).start(port);
 
         server.before(context -> {
@@ -132,24 +138,6 @@ public class WebServer extends Thread {
                 context.status(HttpCode.INTERNAL_SERVER_ERROR);
                 context.result("An error occurred: " + e.getMessage());
             }
-        });
-
-        // I know config.addStaticFiles() would be better, but I didn't
-        // know how to bind a static directory to a specific web path
-        // (e.g. /download/{file} -> %plugindir%/schematics/{file})
-        server.get("/download/{file}", context -> {
-            String reqFile = context.pathParam("file");
-            File file = new File(schemFolder + File.separator + reqFile);
-
-            if (!file.exists()) {
-                context.status(HttpCode.NOT_FOUND);
-                context.result("File does not exist");
-                return;
-            }
-
-            // just in case browsers try to show the file
-            context.header(Header.CONTENT_TYPE, "application/octet-stream");
-            context.result(new FileInputStream(file));
         });
     }
 

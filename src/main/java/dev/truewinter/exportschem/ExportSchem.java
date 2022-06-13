@@ -15,15 +15,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 public class ExportSchem extends JavaPlugin {
     private WebServer webServer;
-    private HashMap<String, Long> schematicTimes = new HashMap<>();
-    private HashMap<String, ImportKey> importKeys = new HashMap<>();
+    private ConcurrentHashMap<String, Long> schematicTimes = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, ImportKey> importKeys = new ConcurrentHashMap<>();
     private Timer deleteTimer;
     private static ExportSchem instance;
 
